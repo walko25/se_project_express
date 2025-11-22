@@ -4,7 +4,9 @@
   "description": "WTWR Back End",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "npx eslint .",
+    "start": "node app.js",
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +19,16 @@
   },
   "homepage": "https://github.com/walko25/se_project_express#readme",
   "dependencies": {
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongoose": "^8.20.0",
+    "validator": "^13.15.23"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.10.2",
+    "eslint-plugin-import": "^2.32.0",
+    "nodemon": "^3.1.11",
+    "prettier": "^2.8.8"
   }
 }
