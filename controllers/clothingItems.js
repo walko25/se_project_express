@@ -1,4 +1,4 @@
-const clothingItem = require("../models/clothingitem");
+const clothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
@@ -7,7 +7,7 @@ const {
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  const owner = (req.user && req.user._id) || req.body.owner;
+  const owner = req.user && req.user._id;
 
   if (!owner) {
     return res
@@ -15,7 +15,7 @@ const createItem = (req, res) => {
       .send({ message: "Owner id is required" });
   }
 
-  clothingItem
+  return clothingItem
     .create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send({ data: item }))
     .catch((err) => {
@@ -30,7 +30,7 @@ const createItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Internal server error" });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -42,25 +42,25 @@ const getItems = (req, res) => {
       console.error(err);
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
+// const updateItem = (req, res) => {
+//   const { itemId } = req.params;
+//   const { imageUrl } = req.body;
 
-  clothingItem
-    .findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.status(200).send(item))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: err.message });
-    });
-};
+//   clothingItem
+//     .findByIdAndUpdate(itemId, { $set: { imageUrl } })
+//     .orFail()
+//     .then((item) => res.status(200).send(item))
+//     .catch((err) => {
+//       console.error(err);
+//       return res
+//         .status(INTERNAL_SERVER_ERROR_CODE)
+//         .send({ message: err.message });
+//     });
+// };
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
@@ -68,12 +68,11 @@ const deleteItem = (req, res) => {
   clothingItem
     .findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => {
-      if (item) {
-        return res.status(200).send({ data: item });
-      }
-      return res.status(200).send({ message: "Item deleted" });
-    })
+    .then((item) =>
+      item
+        ? res.status(200).send({ data: item })
+        : res.status(200).send({ message: "Item deleted" })
+    )
     .catch((err) => {
       console.error("deleteItem error:", err);
 
@@ -91,7 +90,7 @@ const deleteItem = (req, res) => {
 
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "Internal server error" });
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -110,14 +109,34 @@ const likedItem = (req, res) => {
       console.error(err);
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: err.message });
+        .send({ message: "An error has occurred on the server" });
+    });
+};
+
+const dislikeItem = (req, res) => {
+  const { itemId } = req.params;
+
+  clothingItem
+    .findByIdAndUpdate(
+      itemId,
+      { $pull: { likes: req.user._id } },
+      { new: true }
+    )
+    .orFail()
+    .then((item) => res.status(200).send(item))
+    .catch((err) => {
+      console.error(err);
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
 module.exports = {
   createItem,
   getItems,
-  updateItem,
+  // updateItem,
   deleteItem,
   likedItem,
+  dislikeItem,
 };
