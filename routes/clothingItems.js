@@ -3,6 +3,7 @@ const { getItems } = require("../controllers/clothingItems");
 const { updateItem } = require("../controllers/clothingItems");
 const { createItem } = require("../controllers/clothingItems");
 const { deleteItem } = require("../controllers/clothingItems");
+const { likedItem } = require("../controllers/clothingItems");
 
 // CRUD
 
@@ -17,5 +18,9 @@ router.put("/:itemId", updateItem);
 
 // Delete
 router.delete("/:itemId", deleteItem);
+
+//Like
+router.put("/:itemId/likes", likedItem);
+// router.delete("/:id/likes", dislikeItem);
 
 module.exports = router;
