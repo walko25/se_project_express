@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const {
   BAD_REQUEST_ERROR_CODE,
@@ -16,22 +17,33 @@ const getUsers = (req, res) => {
     });
 };
 
-const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+const createUser = async (req, res) => {
+  const { name, avatar, email, password } = req.body;
 
-  User.create({ name, avatar })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: err.message });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server" });
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      name,
+      avatar,
+      email,
+      password: hashedPassword, // Save the hashed version, not the original
     });
+
+    const savedUser = await user.save();
+    return res.status(201).send(savedUser);
+  } catch (err) {
+    console.error(err);
+    if (err.code === 11000) {
+      return res.status(409).send({ message: "Email already exists" });
+    }
+    if (err.name === "ValidationError") {
+      return res.status(BAD_REQUEST_ERROR_CODE).send({ message: err.message });
+    }
+    return res
+      .status(INTERNAL_SERVER_ERROR_CODE)
+      .send({ message: "An error has occurred on the server" });
+  }
 };
 
 const getUser = (req, res) => {
