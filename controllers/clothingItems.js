@@ -1,7 +1,11 @@
 const clothingItem = require("../models/clothingItem");
 const {
+  OK_STATUS_CODE,
+  CREATED_STATUS_CODE,
   BAD_REQUEST_ERROR_CODE,
+  FORBIDDEN_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
+  CONFLICT_ERROR_CODE,
   INTERNAL_SERVER_ERROR_CODE,
 } = require("../utils/errors");
 
@@ -17,7 +21,7 @@ const createItem = (req, res) => {
 
   return clothingItem
     .create({ name, weather, imageUrl, owner })
-    .then((item) => res.status(201).send({ data: item }))
+    .then((item) => res.status(CREATED_STATUS_CODE).send({ data: item }))
     .catch((err) => {
       console.error("createItem error:", err);
       if (err.name === "ValidationError") {
@@ -26,7 +30,9 @@ const createItem = (req, res) => {
           .send({ message: err.message });
       }
       if (err.code === 11000) {
-        return res.status(409).send({ message: "Duplicate item" });
+        return res
+          .status(CONFLICT_ERROR_CODE)
+          .send({ message: "Duplicate item" });
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
@@ -37,7 +43,7 @@ const createItem = (req, res) => {
 const getItems = (req, res) => {
   clothingItem
     .find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.status(OK_STATUS_CODE).send(items))
     .catch((err) => {
       console.error(err);
       return res
@@ -46,35 +52,16 @@ const getItems = (req, res) => {
     });
 };
 
-// const updateItem = (req, res) => {
-//   const { itemId } = req.params;
-//   const { imageUrl } = req.body;
-
-//   clothingItem
-//     .findByIdAndUpdate(itemId, { $set: { imageUrl } })
-//     .orFail()
-//     .then((item) => res.status(200).send(item))
-//     .catch((err) => {
-//       console.error(err);
-//       return res
-//         .status(INTERNAL_SERVER_ERROR_CODE)
-//         .send({ message: err.message });
-//     });
-// };
-
-const deleteItem = (req, res) => {
+const updateItem = (req, res) => {
   const { itemId } = req.params;
+  const { imageUrl } = req.body;
 
   clothingItem
-    .findByIdAndDelete(itemId)
+    .findByIdAndUpdate(itemId, { $set: { imageUrl } })
     .orFail()
-    .then((item) =>
-      item
-        ? res.status(200).send({ data: item })
-        : res.status(200).send({ message: "Item deleted" })
-    )
+    .then((item) => res.status(OK_STATUS_CODE).send(item))
     .catch((err) => {
-      console.error("deleteItem error:", err);
+      console.error("updateItem error:", err);
 
       if (err.name === "DocumentNotFoundError") {
         return res
@@ -94,6 +81,41 @@ const deleteItem = (req, res) => {
     });
 };
 
+const deleteItem = async (req, res) => {
+  const { itemId } = req.params;
+
+  try {
+    const item = await clothingItem.findById(itemId).orFail();
+
+    if (item.owner.toString() !== req.user._id.toString()) {
+      return res
+        .status(FORBIDDEN_ERROR_CODE)
+        .send({ message: "Access denied" });
+    }
+
+    await clothingItem.findByIdAndDelete(itemId);
+    return res.status(OK_STATUS_CODE).send({ data: item });
+  } catch (err) {
+    console.error("deleteItem error:", err);
+
+    if (err.name === "DocumentNotFoundError") {
+      return res
+        .status(NOT_FOUND_ERROR_CODE)
+        .send({ message: "Item not found" });
+    }
+
+    if (err.name === "CastError") {
+      return res
+        .status(BAD_REQUEST_ERROR_CODE)
+        .send({ message: "Invalid item id" });
+    }
+
+    return res
+      .status(INTERNAL_SERVER_ERROR_CODE)
+      .send({ message: "An error has occurred on the server" });
+  }
+};
+
 const likedItem = (req, res) => {
   const { itemId } = req.params;
 
@@ -104,9 +126,22 @@ const likedItem = (req, res) => {
       { new: true }
     )
     .orFail()
-    .then((item) => res.status(200).send(item))
+    .then((item) => res.status(OK_STATUS_CODE).send(item))
     .catch((err) => {
-      console.error(err);
+      console.error("likedItem error:", err);
+
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "Item not found" });
+      }
+
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "Invalid item id" });
+      }
+
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "An error has occurred on the server" });
@@ -123,9 +158,22 @@ const dislikeItem = (req, res) => {
       { new: true }
     )
     .orFail()
-    .then((item) => res.status(200).send(item))
+    .then((item) => res.status(OK_STATUS_CODE).send(item))
     .catch((err) => {
-      console.error(err);
+      console.error("dislikeItem error:", err);
+
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "Item not found" });
+      }
+
+      if (err.name === "CastError") {
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "Invalid item id" });
+      }
+
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "An error has occurred on the server" });
@@ -135,7 +183,6 @@ const dislikeItem = (req, res) => {
 module.exports = {
   createItem,
   getItems,
-  // updateItem,
   deleteItem,
   likedItem,
   dislikeItem,
