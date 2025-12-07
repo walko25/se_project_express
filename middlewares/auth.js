@@ -16,7 +16,7 @@ const auth = (req, res, next) => {
 
     req.user = payload;
 
-    next();
+    return next();
   } catch (err) {
     return res.status(UNAUTHORIZED_ERROR_CODE).send({ message: "Authorization required" });
   }

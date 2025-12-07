@@ -52,41 +52,6 @@ const getItems = (req, res) => {
     });
 };
 
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  clothingItem
-    .findByIdAndUpdate(itemId, { $set: { imageUrl } }, { new: true, runValidators: true })
-    .orFail()
-    .then((item) => res.status(OK_STATUS_CODE).send(item))
-    .catch((err) => {
-      console.error("updateItem error:", err);
-
-      if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "Item not found" });
-      }
-
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Invalid item id" });
-      }
-
-      if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: err.message });
-      }
-
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server" });
-    });
-};
-
 const deleteItem = async (req, res) => {
   const { itemId } = req.params;
 

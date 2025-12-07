@@ -1,13 +1,16 @@
 const router = require("express").Router();
 const clothingItem = require("./clothingItems");
-
 const userRouter = require("./users");
+const auth = require("../middlewares/auth");
 
-router.use("/users", userRouter);
-router.use("/items", clothingItem);
-
+// Public auth routes
 const { login, createUser } = require("../controllers/users");
 
+// Protected routers (require authentication)
+router.use("/users", auth, userRouter);
+router.use("/items", auth, clothingItem);
+
+// Public endpoints for signing in / signing up
 router.post("/signin", login);
 router.post("/signup", createUser);
 
