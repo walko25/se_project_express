@@ -26,6 +26,12 @@ const getUsers = (req, res) => {
 const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).send({
+      message: "Email and password are required",
+    });
+  }
+
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -43,7 +49,9 @@ const createUser = async (req, res) => {
   } catch (err) {
     console.error("createUser error:", err);
     if (err.code === 11000) {
-      return res.status(CONFLICT_ERROR_CODE).send({ message: "Email already exists" });
+      return res
+        .status(CONFLICT_ERROR_CODE)
+        .send({ message: "Email already exists" });
     }
     if (err.name === "ValidationError") {
       return res.status(BAD_REQUEST_ERROR_CODE).send({ message: err.message });
@@ -60,7 +68,9 @@ const getCurrentUser = (req, res) => {
   User.findById(userId)
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_ERROR_CODE).send({ message: "User not found" });
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "User not found" });
       }
       res.status(OK_STATUS_CODE).send(user);
     })
@@ -83,6 +93,12 @@ const getCurrentUser = (req, res) => {
 const login = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).send({
+      message: "Email and password are required",
+    });
+  }
+
   try {
     const user = await User.findUserByCredentials(email, password);
 
@@ -90,7 +106,9 @@ const login = async (req, res) => {
 
     res.status(OK_STATUS_CODE).send({ token });
   } catch (err) {
-    res.status(UNAUTHORIZED_ERROR_CODE).send({ message: "Incorrect email or password" });
+    res
+      .status(UNAUTHORIZED_ERROR_CODE)
+      .send({ message: "Incorrect email or password" });
   }
 };
 
@@ -109,7 +127,9 @@ const updateProfile = (req, res) => {
   )
     .then((user) => {
       if (!user) {
-        return res.status(NOT_FOUND_ERROR_CODE).send({ message: "User not found" });
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "User not found" });
       }
       res.status(OK_STATUS_CODE).send(user);
     })
@@ -117,9 +137,11 @@ const updateProfile = (req, res) => {
       if (err.name === "ValidationError") {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "Validation error", details: err.message });
+          .send({ message: "Validation error" });
       }
-      res.status(INTERNAL_SERVER_ERROR_CODE).send({ message: "An error occurred on the server" });
+      res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error occurred on the server" });
     });
 };
 

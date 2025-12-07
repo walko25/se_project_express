@@ -57,7 +57,7 @@ const updateItem = (req, res) => {
   const { imageUrl } = req.body;
 
   clothingItem
-    .findByIdAndUpdate(itemId, { $set: { imageUrl } })
+    .findByIdAndUpdate(itemId, { $set: { imageUrl } }, { new: true, runValidators: true })
     .orFail()
     .then((item) => res.status(OK_STATUS_CODE).send(item))
     .catch((err) => {
@@ -73,6 +73,12 @@ const updateItem = (req, res) => {
         return res
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "Invalid item id" });
+      }
+
+      if (err.name === "ValidationError") {
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: err.message });
       }
 
       return res
