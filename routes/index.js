@@ -8,7 +8,7 @@ const { login, createUser } = require("../controllers/users");
 
 // Protected routers (require authentication)
 router.use("/users", auth, userRouter);
-router.use("/items", auth, clothingItem);
+router.use("/items", clothingItem);
 
 // Public endpoints for signing in / signing up
 router.post("/signin", login);
