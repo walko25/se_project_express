@@ -1,3 +1,6 @@
+//
+// IMPORTS
+//
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
@@ -12,6 +15,9 @@ const {
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config");
 
+//
+// GET ALL USERS
+//
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(OK_STATUS_CODE).send(users))
@@ -23,6 +29,9 @@ const getUsers = (req, res) => {
     });
 };
 
+//
+// CREATE USER (SIGN UP)
+//
 const createUser = async (req, res) => {
   const { name, avatar, email, password } = req.body;
 
@@ -94,6 +103,9 @@ const getCurrentUser = (req, res) => {
     });
 };
 
+//
+// LOGIN USER
+//
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -118,6 +130,9 @@ const login = async (req, res) => {
   }
 };
 
+//
+// UPDATE PROFILE
+//
 const updateProfile = (req, res) => {
   const userId = req.user._id;
   const { name, avatar } = req.body;
@@ -144,6 +159,9 @@ const updateProfile = (req, res) => {
     });
 };
 
+//
+// EXPORT CONTROLLERS
+//
 module.exports = {
   getUsers,
   createUser,

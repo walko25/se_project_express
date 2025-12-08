@@ -1,3 +1,6 @@
+//
+// IMPORTS
+//
 const clothingItem = require("../models/clothingItem");
 const {
   OK_STATUS_CODE,
@@ -9,6 +12,9 @@ const {
   INTERNAL_SERVER_ERROR_CODE,
 } = require("../utils/errors");
 
+//
+// CREATE ITEM
+//
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user && req.user._id;
@@ -40,6 +46,9 @@ const createItem = (req, res) => {
     });
 };
 
+//
+// GET ALL ITEMS
+//
 const getItems = (req, res) => {
   clothingItem
     .find({})
@@ -52,6 +61,9 @@ const getItems = (req, res) => {
     });
 };
 
+//
+// DELETE ITEM
+//
 const deleteItem = async (req, res) => {
   const { itemId } = req.params;
 
@@ -87,6 +99,9 @@ const deleteItem = async (req, res) => {
   }
 };
 
+//
+// LIKE ITEM
+//
 const likedItem = (req, res) => {
   const { itemId } = req.params;
 
@@ -119,6 +134,9 @@ const likedItem = (req, res) => {
     });
 };
 
+//
+// DISLIKE ITEM
+//
 const dislikeItem = (req, res) => {
   const { itemId } = req.params;
 
@@ -151,6 +169,9 @@ const dislikeItem = (req, res) => {
     });
 };
 
+//
+// EXPORT CONTROLLERS
+//
 module.exports = {
   createItem,
   getItems,
