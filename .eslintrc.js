@@ -30,5 +30,6 @@ module.exports = {
         enforceInMethodNames: false,
       },
     ],
+    "no-unused-vars": ["error", { argsIgnorePattern: "next" }],
   },
 };
