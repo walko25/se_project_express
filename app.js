@@ -38,7 +38,18 @@ app.get("/crash-test", () => {
 // MIDDLEWARE & ROUTES
 //
 app.use(express.json());
-app.use(cors());
+const allowedOrigins = [
+  "https://wtwr.2526.jumpingcrab.com",
+  "http://localhost:3000",
+  "http://localhost:3001",
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 app.use(requestLogger);
 app.use("/", mainRouter);
 
