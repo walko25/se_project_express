@@ -40,6 +40,11 @@ app.get("/crash-test", () => {
 app.use(express.json());
 const allowedOrigins = [
   "https://wtwr.2526.jumpingcrab.com",
+  "https://www.wtwr.2526.jumpingcrab.com",
+  "https://api.wtwr.2526.jumpingcrab.com",
+  "http://wtwr.2526.jumpingcrab.com",
+  "http://www.wtwr.2526.jumpingcrab.com",
+  "http://api.wtwr.2526.jumpingcrab.com",
   "http://localhost:3000",
   "http://localhost:3001",
 ];
