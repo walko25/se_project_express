@@ -7,8 +7,8 @@ const clothingItemSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'The minimum length of the "name" field is 2'],
+    maxlength: [30, 'The maximum length of the "name" field is 30'],
   },
   weather: {
     type: String,
@@ -37,6 +37,7 @@ const clothingItemSchema = new mongoose.Schema({
         ref: "user",
       },
     ],
+    required: true,
     default: [],
   },
   createdAt: {

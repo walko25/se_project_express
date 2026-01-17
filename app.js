@@ -25,6 +25,9 @@ mongoose
     console.error("MongoDB connection error:", err);
   });
 
+// LOGGER
+app.use(requestLogger);
+
 //
 // CRASH TEST ROUTE
 //
@@ -55,7 +58,7 @@ app.use(
     credentials: true,
   })
 );
-app.use(requestLogger);
+
 app.use("/", mainRouter);
 
 // app.use(routes);

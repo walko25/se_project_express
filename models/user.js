@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
+const UnauthorizedError = require("../errors/unauthorized-error");
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    minlength: 2,
-    maxlength: 30,
+    minlength: [2, 'The minimum length of the "name" field is 2'],
+    maxlength: [30, 'The maximum length of the "name" field is 30'],
   },
   avatar: {
     type: String,
@@ -45,16 +46,26 @@ userSchema.statics.findUserByCredentials = function findUserByCredentials(
     .select("+password")
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error("Incorrect email or password"));
+        return Promise.reject(
+          new UnauthorizedError("Incorrect email or password")
+        );
       }
 
       return bcrypt.compare(password, user.password).then((matched) => {
         if (!matched) {
-          return Promise.reject(new Error("Incorrect email or password"));
+          return Promise.reject(
+            new UnauthorizedError("Incorrect email or password")
+          );
         }
         return user;
       });
     });
+};
+
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
 };
 
 module.exports = mongoose.model("user", userSchema);
