@@ -47,7 +47,7 @@ const getItems = (req, res, next) => {
 // DELETE ITEM
 //
 const deleteItem = async (req, res, next) => {
-  const { itemId } = req.params;
+  const { id } = req.params;
 
   try {
     const item = await clothingItem.findById(itemId).orFail();

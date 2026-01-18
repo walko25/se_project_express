@@ -23,3 +23,9 @@ Before committing your code, make sure you edit the file `sprint.txt` in the roo
 #### Live Website
 
 https://wtwr.2526.jumpingcrab.com/
+
+#### Project Pitch Video
+
+Here is a video i made describing the functionality of the WTWR app.
+
+https://drive.google.com/file/d/1oM0QDg6Bs40_gjCbqKqUmlGRmxHbEiJj/view?usp=drive_link
